@@ -1,5 +1,5 @@
 # Defines functions for project
-# Cole Jansma, Vihn Le, Noah Tarver, Bennet Kruse, Connor Schultz, Matthew Spalla
+# Cole Jansma, Vinh Le, Noah Tarver, Bennet Kruse, Connor Schultz, Matthew Spalla
 # 11/12/2026
 
 import numpy as np
