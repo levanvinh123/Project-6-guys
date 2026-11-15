@@ -28,6 +28,8 @@ while car_selection!=5: # loops until car_selection=5
     car_selection=int(car_selection) # transforms car_selection into an integer for use in data_function
 
     if car_selection!=5: # ends program if car_selection=5
-        gear_ratios_labels, gear_ratios, parameters_symbols, parameters, exp_omega_es, exp_torque_es, max_omega_e, max_omega_e_label=mf.data_function(car_selection)
+        gear_ratios_labels, gear_ratios, parameters_symbols, parameters, exp_omega_es, exp_torque_es, max_omega_e, max_omega_e_label = mf.data_function(car_selection)
+        r, omega_es, torque_e_Nms, powers, ps = mf.calculation_function(gear_ratios, parameters, exp_omega_es, exp_torque_es, max_omega_e)
 
 print("\nThank you!\n\n")
+
