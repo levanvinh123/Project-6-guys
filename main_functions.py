@@ -9,7 +9,7 @@ from matplotlib import pyplot as plt
 
 def data_function(car_selection):
 
-    workbook = xl.load_workbook("project_data.xlsx")
+    workbook = xl.load_workbook("test_data.xlsx")
     sheet = workbook["Car{}".format(car_selection)]
 
     gear_ratios_labels = []
@@ -64,14 +64,14 @@ def data_function(car_selection):
 def calculation_function(gear_ratios,parameters,exp_omega_es, exp_torque_es, max_omega_e):
 
     # Assigns names to parameters to aid in calculation
-    car_velocity_kmh = parameters[0]
-    terrain_slope = parameters[1]
+    car_velocity_ms = parameters[0] * 1000 / 3600 # converts km/hr to m/s
+    terrain_slope_rad = np.atan(parameters[1] / 100) # converts from grade to rad
     wheelbase = parameters[2]
     wheel_radius = parameters[3]
-    roll_resistance_coeff = parameters[4]
+    roll_resistance_coeff = parameters[4] 
     CoG_height = parameters[5]
-    final_drive_eff = parameters[6]
-    transmission_eff = parameters[7]
+    final_drive_eff = parameters[6] / 100 # converts out of percent and into decimal
+    transmission_eff = parameters[7] / 100 # converts out of percent and into decimal
     car_weight = parameters[8]
     air_density = parameters[9]
     final_drive_ratio = parameters[10]
@@ -79,12 +79,10 @@ def calculation_function(gear_ratios,parameters,exp_omega_es, exp_torque_es, max
     drag_coeff = parameters[12]
     frontal_area = parameters[13]
 
-    car_velocity_ms = car_velocity_kmh * 1000 / 3600 # converts km/hr to m/s for calculations
-
     torque_rpm_curve_fit = poly.fit(exp_omega_es,exp_torque_es,4) # fits a quartic curve to the rpm-torque data
 
-    r_rolling = roll_resistance_coeff * car_weight * np.cos(terrain_slope) # rolling resistance
-    grade_load = car_weight * np.sin(terrain_slope) # grade load
+    r_rolling = roll_resistance_coeff * car_weight * np.cos(terrain_slope_rad) # rolling resistance
+    grade_load = car_weight * np.sin(terrain_slope_rad) # grade load
     r_air = 0.5 * air_density * drag_coeff * frontal_area * car_velocity_ms**2 # air drag
 
     r = r_rolling + grade_load + r_air # R
@@ -124,9 +122,9 @@ def calculation_function(gear_ratios,parameters,exp_omega_es, exp_torque_es, max
             torque_e_Nm = torque_rpm_curve_fit(omega_e)
             torque_e_Nms.append(torque_e_Nm)
             
-            torque_e_ftlb = torque_e_Nm * 0.737562149
+            torque_e_ftlb = torque_e_Nm * 0.737562149277
 
-            power = (omega_e * torque_e_ftlb) / 5252
+            power = (omega_e * torque_e_ftlb) / 5252.113
             powers.append(power)
 
             torque_t = transmission_eff * gear_ratios[i] * torque_e_Nm
