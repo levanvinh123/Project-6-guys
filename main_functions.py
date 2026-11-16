@@ -79,6 +79,8 @@ def calculation_function(gear_ratios,parameters,exp_omega_es, exp_torque_es, max
     drag_coeff = parameters[12]
     frontal_area = parameters[13]
 
+    rear_wheel_CoG_distance = wheelbase - front_wheel_CoG_distance
+
     torque_rpm_curve_fit = poly.fit(exp_omega_es,exp_torque_es,4) # fits a quartic curve to the rpm-torque data
 
     r_rolling = roll_resistance_coeff * car_weight * np.cos(terrain_slope_rad) # rolling resistance
@@ -96,6 +98,13 @@ def calculation_function(gear_ratios,parameters,exp_omega_es, exp_torque_es, max
     torque_ts = [] # torque at transmission for each gear
     torque_ds = [] # torque at differential for each gear
     ps = [] # P for each gear
+    accelerations = [] # a for each gear
+    wfs = []
+    wrs = []
+    wf_stats = []
+    wr_stats = []
+
+    g = 9.8
 
     for i in range(0,6):
         
@@ -116,6 +125,21 @@ def calculation_function(gear_ratios,parameters,exp_omega_es, exp_torque_es, max
 
             torque_d = "OOR"
             torque_ds.append(torque_d)
+
+            acceleration = "OOR"
+            accelerations.append(acceleration)
+            
+            wf_stat = "OOR"
+            wf_stats.append(wf_stat)
+
+            wr_stat = "OOR"
+            wr_stats.append(wr_stat)
+
+            wf = "OOR"
+            wfs.append(wf)
+
+            wr = "OOR"
+            wrs.append(wr)
         else:
             omega_es.append(omega_e)
 
@@ -136,8 +160,20 @@ def calculation_function(gear_ratios,parameters,exp_omega_es, exp_torque_es, max
             p = torque_d / wheel_radius
             ps.append(p)
 
-    return r, omega_es, torque_e_Nms, powers, ps
+            acceleration = (g / car_weight) * (p - r)
+            accelerations.append(acceleration)
 
+            wf_stat = car_weight * (rear_wheel_CoG_distance / wheelbase)
+            wf_stats.append(wf_stat)
 
+            wr_stat = car_weight * (front_wheel_CoG_distance / wheelbase)
+            wr_stats.append(wr_stat)
 
+            wf = wf_stat * np.cos(terrain_slope_rad) - (CoG_height / wheelbase) * (car_weight * np.sin(terrain_slope_rad) + (car_weight / g) * acceleration) - (CoG_height / wheelbase) * r_air
+            wfs.append(wf)
+
+            wr = wr_stat * np.cos(terrain_slope_rad) + (CoG_height / wheelbase) * (car_weight * np.sin(terrain_slope_rad) + (car_weight / g) * acceleration) + (CoG_height / wheelbase) * r_air
+            wrs.append(wr)
+
+    return r, omega_es, torque_e_Nms, powers, ps, accelerations, wfs, wrs, wf_stats, wr_stats
 
