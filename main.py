@@ -32,4 +32,3 @@ while car_selection!=5: # loops until car_selection=5
         r, omega_es, torque_e_Nms, powers, ps = mf.calculation_function(gear_ratios, parameters, exp_omega_es, exp_torque_es, max_omega_e)
 
 print("\nThank you!\n\n")
-
